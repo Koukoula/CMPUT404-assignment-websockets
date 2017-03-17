@@ -80,6 +80,7 @@ class Client:
         return self.queue.get()
 
 def send_all(msg):
+    print clients
     for client in clients:
         client.put( msg )
 
@@ -100,11 +101,9 @@ def read_ws(ws,client):
             msg = ws.receive()
             print "WS RECV: %s" % msg
             if (msg is not None):
-                packet = json.loads(msg)
-                #Packet is a query. Can either be 'world', and we dump the data
-                #or it is an update, and we set entity into the world.
-                # can it also request a clear?
-                query = msg['query']
+                data = json.loads(msg)
+                query = data["query"]
+                print query
                 if query == 'world':
                 #need to just dump a dictionary where query is world and entities is the world
                     packet = {'query': 'world', 'world': myWorld.world()}
@@ -117,8 +116,8 @@ def read_ws(ws,client):
                         print(entity)
                         myWorld.set(entity , entities[entity])
                     #data = msg['data']
-                    packet = {'query': 'entities', 'entities': entities}
-                    send_all_json( packet )
+                    #packet = {'query': 'entities', 'entities': entities}
+                    #send_all_json( packet )
             else:
                 break
     except:
