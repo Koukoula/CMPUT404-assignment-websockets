@@ -83,20 +83,7 @@ def subscribe_socket(ws):
     '''Fufill the websocket URL of /subscribe, every update notify the
        websocket and read updates from the websocket '''
     # XXX: TODO IMPLEMENT ME
-    client = Client()
-    clients.append(client)
-    g = gevent.spawn( read_ws, ws, client )
-    try:
-        while True:
-            # block here
-            msg = client.get()
-            ws.send(msg)
-    except Exception as e:# WebSocketError as e:
-        print "WS Error %s" % e
-    finally:
-        clients.remove(client)
-        gevent.kill(g)
-
+    return None
 
 def flask_post_json():
     '''Ah the joys of frameworks! They do so much work for you
@@ -140,7 +127,6 @@ def clear():
     headers = {"Content-Type":"application/json"}
     response = json.dumps(myWorld.world())
     return make_response(response,200,headers)
-
 
 
 if __name__ == "__main__":
