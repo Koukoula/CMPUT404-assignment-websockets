@@ -114,8 +114,8 @@ def read_ws(ws,client):
                     for entity in entities:
                         myWorld.set(entity , entities[entity])
                     #data = msg['data']
-                    #packet = {'query': 'entities', 'entities': entities}
-                    #send_all_json( packet )
+                    packet = {'query': 'entities', 'entities': entities}
+                    send_all_json( packet )
             else:
                 break
     except:

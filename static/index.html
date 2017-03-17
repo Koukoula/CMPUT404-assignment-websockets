@@ -41,7 +41,6 @@ function debug(str) {
     var debugDiv = document.getElementById('debug');
     debugDiv.innerHTML = "" + str;
 }
-debug("Test");
 
 
 world = {};
@@ -127,7 +126,8 @@ function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just modified!
-    var entity_world = {entity:data}
+    var entity_world = {};
+    entity_world[entity] = data;
     var message = {'query':'entities','entities':entity_world}
     socket.send(JSON.stringify(message))
 
@@ -268,7 +268,7 @@ function wsSetup() {
     };
     socket.onmessage = function(msg) {
         try {
-            debug("WebSocket Recv:" + msg.data);
+            //debug("WebSocket Recv:" + msg.data);
             var data = JSON.parse(msg.data);
             var object = data[data['query']];
             for (var entity in object) {
