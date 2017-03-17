@@ -103,7 +103,6 @@ def read_ws(ws,client):
             if (msg is not None):
                 data = json.loads(msg)
                 query = data["query"]
-                print query
                 if query == 'world':
                 #need to just dump a dictionary where query is world and entities is the world
                     packet = {'query': 'world', 'world': myWorld.world()}
@@ -111,9 +110,8 @@ def read_ws(ws,client):
 
                 elif query == 'entities':
                 #need to grab the entities and use myWorld.set
-                    entities = msg['entities']
+                    entities = data['entities']
                     for entity in entities:
-                        print(entity)
                         myWorld.set(entity , entities[entity])
                     #data = msg['data']
                     #packet = {'query': 'entities', 'entities': entities}
