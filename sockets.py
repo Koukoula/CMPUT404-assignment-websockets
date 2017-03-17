@@ -69,11 +69,34 @@ myWorld.add_set_listener( set_listener )
 @app.route('/')
 def hello():
     '''Return something coherent here.. perhaps redirect to /static/index.html '''
-    return None
+    #http://stackoverflow.com/questions/14343812/redirecting-to-url-in-flask    
+    return flask.redirect("/static/index.html", code=301)
 
 def read_ws(ws,client):
     '''A greenlet function that reads from the websocket and updates the world'''
     # XXX: TODO IMPLEMENT ME
+    try:
+        while True:
+            msg = ws.receive()
+            print "WS RECV: %s" % msg
+            if (msg is not None):
+                packet = json.loads(msg)
+                #Packet is a query. Can either be 'world', and we dump the data
+                #or it is an update, and we set entity into the world.
+                # can it also request a clear?
+                query = msg['query']
+                if query == 'world':
+                #need to just dump a dictionary where query is world and entities is the world
+                    data = {'query': 'world', 'entities': myWorld.world()}
+                elif query == 'update':
+                #need to grab the entities and use myWorld.set
+                    
+
+            else:
+                break
+    except:
+        '''Done'''
+
     return None
 
 @sockets.route('/subscribe')
@@ -81,6 +104,21 @@ def subscribe_socket(ws):
     '''Fufill the websocket URL of /subscribe, every update notify the
        websocket and read updates from the websocket '''
     # XXX: TODO IMPLEMENT ME
+    client = Client()
+    clients.append(client)
+    g = gevent.spawn( read_ws, ws, client )    
+    print "Subscribing"
+    try:
+        while True:
+            # block here
+            msg = client.get()
+            print "Got a message!"
+            ws.send(msg)
+    except Exception as e:# WebSocketError as e:
+        print "WS Error %s" % e
+    finally:
+        clients.remove(client)
+        gevent.kill(g)
     return None
 
 
