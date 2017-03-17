@@ -24,6 +24,7 @@
   </head>
   <body bgcolor="white" height="100%" width="100%">
     <div id="debug"></div>
+    <img src="hindle.jpg" id="hindle" style="display: none;">
     <canvas id="c" width="100%" height="100%" style="-webkit-tap-highlight-color: transparent;"></canvas>
 
     <script>
@@ -34,6 +35,8 @@ var context = canvas.getContext("2d");
 var W = canvas.width  = window.innerWidth-6;
 var H = canvas.height = window.innerHeight-50;
 var wscounter = 0;
+var img = document.getElementById("hindle");
+var pat = context.createPattern(img, "no-repeat");
 var socket;
 
 
@@ -53,10 +56,29 @@ function drawCircle(context,entity) {
         var x = entity["x"];
         var y = entity["y"];
         //moveTo(x,y);
-        fillStyle = entity["colour"];
+        var type = entity["type"]
+        if (type === "image") {
+          fillStyle = pat;
+        }
+        else if (type === 'gradient1') {
+          var gradient = context.createRadialGradient(x, y, 5, x, y, 70);
+          gradient.addColorStop(0,"DarkOrange");
+          gradient.addColorStop(1,"Gold");
+          fillStyle = gradient
+        }
+        else if (type === 'gradient2') {
+          var gradient = context.createRadialGradient(x, y, 5, x, y, 70);
+          gradient.addColorStop(0,"DeepSkyBlue");
+          gradient.addColorStop(1,"LightSteelBlue");
+          fillStyle = gradient
+        }
+        else {
+          fillStyle = entity["colour"];
+        }
         strokeStyle = fillStyle;
-        arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);
-        stroke();
+        arc(x, y, (entity["radius"])?entity["radius"]:60, 0, 2.0 * Math.PI, false);
+        fill();
+        //stroke();
     }
 }
 
@@ -66,6 +88,9 @@ function prepEntity(entity) {
     }
     if (!entity["radius"]) {
         entity["radius"] = 50;
+    }
+    if (!entity["type"]) {
+        entity["type"] = 'colour';
     }
     return entity;
 }
@@ -237,16 +262,15 @@ mouse = (function() {
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+    addEntityWithoutName({'x':x,'y':y,'type':'gradient1'})
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+    addEntityWithoutName({'x':x,'y':y,'type':'gradient2'})
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
-                          'radius':10});
+    addEntityWithoutName({'x':x,'y':y,'type':'image'})
 });
 
 
