@@ -34,23 +34,13 @@ class World:
         # we've got listeners now!
         self.listeners = list()
 
-    def add_set_listener(self, listener):
-        self.listeners.append( listener )
-
     def update(self, entity, key, value):
         entry = self.space.get(entity,dict())
         entry[key] = value
         self.space[entity] = entry
-        self.update_listeners( entity )
 
     def set(self, entity, data):
         self.space[entity] = data
-        self.update_listeners( entity )
-
-    def update_listeners(self, entity):
-        '''update the set listeners'''
-        for listener in self.listeners:
-            listener(entity, self.get(entity))
 
     def clear(self):
         self.space = dict()
@@ -62,11 +52,6 @@ class World:
         return self.space
 
 myWorld = World()
-
-def set_listener( entity, data ):
-    ''' do something with the update ! '''
-
-myWorld.add_set_listener( set_listener )
 
 #https://github.com/abramhindle/WebSocketsExamples/blob/master/chat.py
 class Client:
@@ -95,27 +80,19 @@ def hello():
 
 def read_ws(ws,client):
     '''A greenlet function that reads from the websocket and updates the world'''
-    # XXX: TODO IMPLEMENT ME
     try:
         while True:
             msg = ws.receive()
             print "WS RECV: %s" % msg
             if (msg is not None):
                 data = json.loads(msg)
-                query = data["query"]
-                if query == 'world':
-                #need to just dump a dictionary where query is world and entities is the world
-                    packet = {'query': 'world', 'world': myWorld.world()}
-                    send_all_json( packet )
-
-                elif query == 'entities':
-                #need to grab the entities and use myWorld.set
-                    entities = data['entities']
-                    for entity in entities:
-                        myWorld.set(entity , entities[entity])
-                    #data = msg['data']
-                    packet = {'query': 'entities', 'entities': entities}
-                    send_all_json( packet )
+                send_all_json( data )
+                if 'new_client' in data:
+                    send_all_json( myWorld.world() )
+                else:
+                    for entity in data:
+                        myWorld.set(entity , data[entity])
+                    send_all_json( data )
             else:
                 break
     except:
@@ -125,7 +102,6 @@ def read_ws(ws,client):
 def subscribe_socket(ws):
     '''Fufill the websocket URL of /subscribe, every update notify the
        websocket and read updates from the websocket '''
-    # XXX: TODO IMPLEMENT ME
     client = Client()
     clients.append(client)
     g = gevent.spawn( read_ws, ws, client )
@@ -142,7 +118,7 @@ def subscribe_socket(ws):
         clients.remove(client)
         gevent.kill(g)
 
-
+# Old AJAX stuff
 def flask_post_json():
     '''Ah the joys of frameworks! They do so much work for you
        that they get in the way of sane operation!'''
