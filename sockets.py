@@ -68,6 +68,24 @@ def set_listener( entity, data ):
 
 myWorld.add_set_listener( set_listener )
 
+#https://github.com/abramhindle/WebSocketsExamples/blob/master/chat.py
+class Client:
+    def __init__(self):
+        self.queue = queue.Queue()
+
+    def put(self, v):
+        self.queue.put_nowait(v)
+
+    def get(self):
+        return self.queue.get()
+
+def send_all(msg):
+    for client in clients:
+        client.put( msg )
+
+def send_all_json(obj):
+    send_all( json.dumps(obj) )
+
 @app.route('/')
 def hello():
     '''Return something coherent here.. perhaps redirect to /static/index.html '''
@@ -89,17 +107,21 @@ def read_ws(ws,client):
                 query = msg['query']
                 if query == 'world':
                 #need to just dump a dictionary where query is world and entities is the world
-                    data = {'query': 'world', 'entities': myWorld.world()}
-                elif query == 'update':
-                #need to grab the entities and use myWorld.set
+                    packet = {'query': 'world', 'world': myWorld.world()}
+                    send_all_json( packet )
                     
-
+                elif query == 'entities':
+                #need to grab the entities and use myWorld.set
+                    entities = msg['entities']
+                    for entity in entities:
+                        myWorld.set(entity , entities[entity])
+                    #data = msg['data']
+                    packet = {'query': 'entities', 'entities': entities}
+                    send_all_json( packet )
             else:
                 break
     except:
         '''Done'''
-
-    return None
 
 @sockets.route('/subscribe')
 def subscribe_socket(ws):
@@ -121,7 +143,7 @@ def subscribe_socket(ws):
     finally:
         clients.remove(client)
         gevent.kill(g)
-    return None
+
 
 def flask_post_json():
     '''Ah the joys of frameworks! They do so much work for you
