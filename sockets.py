@@ -89,7 +89,7 @@ def send_all_json(obj):
 @app.route('/')
 def hello():
     '''Return something coherent here.. perhaps redirect to /static/index.html '''
-    #http://stackoverflow.com/questions/14343812/redirecting-to-url-in-flask    
+    #http://stackoverflow.com/questions/14343812/redirecting-to-url-in-flask
     return flask.redirect("/static/index.html", code=301)
 
 def read_ws(ws,client):
@@ -109,11 +109,12 @@ def read_ws(ws,client):
                 #need to just dump a dictionary where query is world and entities is the world
                     packet = {'query': 'world', 'world': myWorld.world()}
                     send_all_json( packet )
-                    
+
                 elif query == 'entities':
                 #need to grab the entities and use myWorld.set
                     entities = msg['entities']
                     for entity in entities:
+                        print(entity)
                         myWorld.set(entity , entities[entity])
                     #data = msg['data']
                     packet = {'query': 'entities', 'entities': entities}
@@ -130,7 +131,7 @@ def subscribe_socket(ws):
     # XXX: TODO IMPLEMENT ME
     client = Client()
     clients.append(client)
-    g = gevent.spawn( read_ws, ws, client )    
+    g = gevent.spawn( read_ws, ws, client )
     print "Subscribing"
     try:
         while True:
