@@ -36,13 +36,13 @@ var H = canvas.height = window.innerHeight-50;
 var wscounter = 0;
 var socket;
 
-/*
+
 function debug(str) {
     var debugDiv = document.getElementById('debug');
     debugDiv.innerHTML = "" + str;
 }
 debug("Test");
-*/
+
 
 world = {};
 
@@ -264,11 +264,11 @@ function wsSetup() {
         socket.send(JSON.stringify(message));
     };
     socket.onerror = function(msg) {
-        //debug("WebSocket Error:" + msg.data);
+        debug("WebSocket Error:" + msg.data);
     };
     socket.onmessage = function(msg) {
         try {
-            //debug("WebSocket Recv:" + msg.data);
+            debug("WebSocket Recv:" + msg.data);
             var data = JSON.parse(msg.data);
             var object = data[data['query']];
             for (var entity in object) {
