@@ -6,7 +6,7 @@
     <meta content='width=device-width; height=device-height; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;' name='viewport' />
     <meta name="viewport" content="width=device-width" />
     <meta name="license" content="
-	
+
 	    Copyright 2017 Panayioti Koukoulas, Noah Shillington
         Licensed under the Apache License, Version 2.0 (the "License");
         you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
         WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
         See the License for the specific language governing permissions and
         limitations under the License.
-        
+
 		Derived from:
         Copyright 2013 Google, Abram Hindle
 
@@ -34,6 +34,7 @@
         limitations under the License.
     "/>
     <script src="json2.js"></script>
+    <script src="jquery-3.2.0.min.js"></script>
   </head>
   <body bgcolor="white" height="100%" width="100%">
     <div id="debug"></div>
@@ -126,19 +127,11 @@ function renderFrame() {
     }
 }
 
-var drawNext = true;
-// Signals that there's something to be drawn
-function drawNextFrame() {
-    drawNext = true;
-}
 
 // This optionally draws the frame, call this if you're not sure if you should update
 // the canvas
 function drawFrame() {
-    if (drawNext) {
-        renderFrame();
-        drawNext = false;
-    }
+  renderFrame();
 }
 
 // This is unpleasent, canvas clicks are not handled well
@@ -162,7 +155,7 @@ function getPosition(e) {
 
 function addEntity(entity, data) {
     world[entity] = data;
-    drawNextFrame(); // (but should we?)
+    drawFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just modified!
     var message = {};
     message[entity] = data;
@@ -286,11 +279,6 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 });
 
 
-function update() {
-    drawFrame();
-}
-
-
 function wsSetup() {
     var url = "ws://"+host+"/subscribe";
     socket = new WebSocket(url);
@@ -307,23 +295,19 @@ function wsSetup() {
             //debug("WebSocket Recv:" + msg.data);
             var data = JSON.parse(msg.data);
             for (var entity in data) {
-              world[entity] = object[entity];
+              world[entity] = data[entity];
             }
-            drawNextFrame();
+            drawFrame();
         } catch (e) {
             alert("socket on message: " + e);
         }
     };
 }
 
-wsSetup();
-
-
-
-
-// 30 frames per second
-//drawNextFrame();
-setInterval( update, 1000/30.0);
+// Accessed from http://stackoverflow.com/a/545005 on March 17, 2017
+$(window).on("load", function() {
+  wsSetup();
+});
 
 
     </script>

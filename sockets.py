@@ -48,8 +48,6 @@ clients = list()
 class World:
     def __init__(self):
         self.clear()
-        # we've got listeners now!
-        self.listeners = list()
 
     def update(self, entity, key, value):
         entry = self.space.get(entity,dict())
@@ -78,6 +76,10 @@ class Client:
     def put(self, v):
         self.queue.put_nowait(v)
 
+    def put_json(self, v):
+        print json.dumps(v)
+        self.put( json.dumps(v) )
+
     def get(self):
         return self.queue.get()
 
@@ -103,7 +105,6 @@ def read_ws(ws,client):
             print "WS RECV: %s" % msg
             if (msg is not None):
                 data = json.loads(msg)
-                send_all_json( data )
                 if 'new_client' in data:
                     send_all_json( myWorld.world() )
                 else:
