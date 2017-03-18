@@ -34,6 +34,7 @@
         limitations under the License.
     "/>
     <script src="json2.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   </head>
   <body bgcolor="white" height="100%" width="100%">
     <div id="debug"></div>
@@ -126,19 +127,11 @@ function renderFrame() {
     }
 }
 
-var drawNext = true;
-// Signals that there's something to be drawn
-function drawNextFrame() {
-    drawNext = true;
-}
 
 // This optionally draws the frame, call this if you're not sure if you should update
 // the canvas
 function drawFrame() {
-    if (drawNext) {
-        renderFrame();
-        drawNext = false;
-    }
+  renderFrame();
 }
 
 // This is unpleasent, canvas clicks are not handled well
@@ -162,7 +155,7 @@ function getPosition(e) {
 
 function addEntity(entity, data) {
     world[entity] = data;
-    drawNextFrame(); // (but should we?)
+    drawFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just modified!
     var message = {};
     message[entity] = data;
@@ -286,11 +279,6 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 });
 
 
-function update() {
-    drawFrame();
-}
-
-
 function wsSetup() {
     var url = "ws://"+host+"/subscribe";
     socket = new WebSocket(url);
@@ -307,23 +295,18 @@ function wsSetup() {
             //debug("WebSocket Recv:" + msg.data);
             var data = JSON.parse(msg.data);
             for (var entity in data) {
-              world[entity] = object[entity];
+              world[entity] = data[entity];
             }
-            drawNextFrame();
+            drawFrame();
         } catch (e) {
             alert("socket on message: " + e);
         }
     };
 }
 
-wsSetup();
-
-
-
-
-// 30 frames per second
-//drawNextFrame();
-setInterval( update, 1000/30.0);
+$(window).on("load", function() {
+  wsSetup();
+});
 
 
     </script>
