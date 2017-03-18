@@ -57,5 +57,12 @@ Contributors
 
 * Mark Galloway
 * Abram Hindle
+
+Code contains additions from:
 * Panayioti Koukoulas
 * Noah Shillignton
+
+Braedy Kuzma assisted in the understanding of the assignment by explaing 
+the purpose of listeners in the world class, as well as helping with identifying 
+bugs in the code. 
+Image of Abram Hindle taken from https://d1pbog36rugm0t.cloudfront.net/-/media/science/people/hindle1/hindle.jpg.
